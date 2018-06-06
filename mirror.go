@@ -30,8 +30,13 @@ func mirrorStatus(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, message)
 }
 
+func mirrorIp(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, r.RemoteAddr)
+}
+
 func main() {
 	http.HandleFunc("/status/", mirrorStatus)
+	http.HandleFunc("/ip/", mirrorIp)
 
 	fmt.Println("Listening at 8799")
 	log.Fatal(http.ListenAndServe(":8799", nil))
