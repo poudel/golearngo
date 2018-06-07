@@ -1,20 +1,19 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
-	"encoding/json"
 )
 
 type StatusResponse struct {
-	Message string `json:"message"`
-	StatusCode int `json:"status_code"`
-	Origin string `json:"origin"`
+	Message    string `json:"message"`
+	StatusCode int    `json:"status_code"`
+	Origin     string `json:"origin"`
 }
-
 
 func mirrorStatus(w http.ResponseWriter, r *http.Request) {
 	status := strings.TrimRight(r.URL.Path[len("/status/"):], "/")
@@ -51,9 +50,19 @@ func mirrorStatus(w http.ResponseWriter, r *http.Request) {
 	w.Write(js)
 }
 
+type IpResponse struct {
+	Origin string `json:"origin"`
+}
 
 func mirrorIp(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, r.RemoteAddr)
+	response := IpResponse{r.RemoteAddr}
+	js, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(js)
 }
 
 func main() {
