@@ -10,19 +10,20 @@ import (
 	"time"
 )
 
-type StatusResponse struct {
-	Message    string `json:"message"`
-	StatusCode int    `json:"status_code"`
-	Ip         string `json:"ip"`
-	Method     string `json:"method"`
-}
-
 func cleanIp(addr string) string {
 	occur := strings.LastIndex(addr, ":")
 	return addr[:occur]
 }
 
 func mirrorStatus(w http.ResponseWriter, r *http.Request) {
+
+	type StatusResponse struct {
+		Message    string `json:"message"`
+		StatusCode int    `json:"status_code"`
+		Ip         string `json:"ip"`
+		Method     string `json:"method"`
+	}
+
 	status := strings.TrimRight(r.URL.Path[len("/status/"):], "/")
 
 	// try to see if it can be converted to integer
@@ -58,11 +59,12 @@ func mirrorStatus(w http.ResponseWriter, r *http.Request) {
 	w.Write(js)
 }
 
-type IpResponse struct {
-	Ip string `json:"ip"`
-}
-
 func mirrorIp(w http.ResponseWriter, r *http.Request) {
+
+	type IpResponse struct {
+		Ip string `json:"ip"`
+	}
+
 	response := IpResponse{cleanIp(r.RemoteAddr)}
 	js, err := json.Marshal(response)
 	if err != nil {
@@ -73,16 +75,17 @@ func mirrorIp(w http.ResponseWriter, r *http.Request) {
 	w.Write(js)
 }
 
-type NowResponse struct {
-	RFC3339         string `json:"rfc3339"`
-	ANSIC           string `json:"ansi_c"`
-	UnixDate        string `json:"unix_date"`
-	UnixSeconds     int64  `json:"unix_seconds"`
-	UnixNanoSeconds int64  `json:"unix_nano_seconds"`
-	Ip              string `json:"ip"`
-}
-
 func mirrorNow(w http.ResponseWriter, r *http.Request) {
+
+	type NowResponse struct {
+		RFC3339         string `json:"rfc3339"`
+		ANSIC           string `json:"ansi_c"`
+		UnixDate        string `json:"unix_date"`
+		UnixSeconds     int64  `json:"unix_seconds"`
+		UnixNanoSeconds int64  `json:"unix_nano_seconds"`
+		Ip              string `json:"ip"`
+	}
+
 	now := time.Now()
 	response := NowResponse{
 		now.Format(time.RFC3339),
@@ -102,12 +105,13 @@ func mirrorNow(w http.ResponseWriter, r *http.Request) {
 	w.Write(js)
 }
 
-type UserAgentResponse struct {
-	UserAgent string `json:"user_agent"`
-	Ip        string `json:"ip"`
-}
-
 func mirrorUserAgent(w http.ResponseWriter, r *http.Request) {
+
+	type UserAgentResponse struct {
+		UserAgent string `json:"user_agent"`
+		Ip        string `json:"ip"`
+	}
+
 	response := UserAgentResponse{
 		r.UserAgent(),
 		cleanIp(r.RemoteAddr),
@@ -121,12 +125,33 @@ func mirrorUserAgent(w http.ResponseWriter, r *http.Request) {
 	w.Write(js)
 }
 
+func index(w http.ResponseWriter, r *http.Request) {
+	type IndexResponse struct {
+		Apis [4]string `json:"apis"`
+		Ip   string    `json:"ip"`
+	}
+
+	response := IndexResponse{
+		[4]string{"/status/:code/", "/ip/", "/now/", "/user-agent/"},
+		cleanIp(r.RemoteAddr),
+	}
+	js, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(js)
+}
+
 func main() {
+	http.HandleFunc("/", index)
 	http.HandleFunc("/status/", mirrorStatus)
 	http.HandleFunc("/ip/", mirrorIp)
 	http.HandleFunc("/now/", mirrorNow)
 	http.HandleFunc("/user-agent/", mirrorUserAgent)
 
-	fmt.Println("Listening at 8799")
+	log.Printf("Listening at http://localhost:8799/")
 	log.Fatal(http.ListenAndServe(":8799", nil))
 }
