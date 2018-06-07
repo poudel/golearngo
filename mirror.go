@@ -13,6 +13,7 @@ type StatusResponse struct {
 	Message    string `json:"message"`
 	StatusCode int    `json:"status_code"`
 	Ip         string `json:"ip"`
+	Method string `json:"method"`
 }
 
 func cleanIp(addr string) string {
@@ -41,6 +42,7 @@ func mirrorStatus(w http.ResponseWriter, r *http.Request) {
 		message,
 		status_code,
 		cleanIp(r.RemoteAddr),
+		r.Method,
 	}
 
 	js, err := json.Marshal(response)
