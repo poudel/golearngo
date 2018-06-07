@@ -6,7 +6,15 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"encoding/json"
 )
+
+type StatusResponse struct {
+	Message string `json:"message"`
+	StatusCode int `json:"status_code"`
+	Origin string `json:"origin"`
+}
+
 
 func mirrorStatus(w http.ResponseWriter, r *http.Request) {
 	status := strings.TrimRight(r.URL.Path[len("/status/"):], "/")
@@ -25,10 +33,24 @@ func mirrorStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(status_code)
+	response := StatusResponse{
+		message,
+		status_code,
+		r.RemoteAddr,
+	}
 
-	fmt.Fprintf(w, message)
+	js, err := json.Marshal(response)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status_code)
+	w.Write(js)
 }
+
 
 func mirrorIp(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, r.RemoteAddr)
