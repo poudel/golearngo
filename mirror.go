@@ -102,10 +102,30 @@ func mirrorNow(w http.ResponseWriter, r *http.Request) {
 	w.Write(js)
 }
 
+type UserAgentResponse struct {
+	UserAgent string `json:"user_agent"`
+	Ip        string `json:"ip"`
+}
+
+func mirrorUserAgent(w http.ResponseWriter, r *http.Request) {
+	response := UserAgentResponse{
+		r.UserAgent(),
+		cleanIp(r.RemoteAddr),
+	}
+	js, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(js)
+}
+
 func main() {
 	http.HandleFunc("/status/", mirrorStatus)
 	http.HandleFunc("/ip/", mirrorIp)
 	http.HandleFunc("/now/", mirrorNow)
+	http.HandleFunc("/user-agent/", mirrorUserAgent)
 
 	fmt.Println("Listening at 8799")
 	log.Fatal(http.ListenAndServe(":8799", nil))

@@ -9,6 +9,22 @@ series. Some that stand out to me are:
 
 ## mirror.go
 
+### User agent
+
+Requesting `http://localhost:8799/user-agent/` will yield a response similar to
+the following:
+
+```json
+{
+  "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36",
+  "ip": "[::1]"
+}
+// GET http://localhost:8799/user-agent/
+// HTTP/1.1 200 OK
+// Content-Type: application/json
+```
+
+
 ### Time
 
 Return current server time in different formats:
