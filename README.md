@@ -9,6 +9,30 @@ series. Some that stand out to me are:
 
 ## mirror.go
 
+### Headers
+
+Requesting `http://localhost:8799/headers/` will yield a response similar to
+the following:
+
+```json
+{
+  "headers": {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.5",
+    "Connection": "keep-alive",
+    "Cookie": "csrftoken=vMAAEmcfMPSjToiFqDtq7O6Nhoack1pQTZdbcpjFqieASJi9whARd6CqvOa57uvY; _ga=GA1.1.1395202726.1515485876; hblid=GnGY8MdTRPm5BQjO3m39N0J02OF0Ao2x; olfsk=olfsk824434969431056; sessionid=xx6ft2gxb5t7hm2dkm60rl1sw1wh9mmn",
+    "Upgrade-Insecure-Requests": "1",
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0"
+  },
+  "ip": "[::1]"
+}
+// GET http://localhost:8799/headers/
+// HTTP/1.1 200 OK
+// Content-Type: application/json
+```
+
+
 ### User agent
 
 Requesting `http://localhost:8799/user-agent/` will yield a response similar to
