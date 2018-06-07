@@ -9,6 +9,30 @@ series. Some that stand out to me are:
 
 ## mirror.go
 
+### Time
+
+Return current server time in different formats:
+
+Sending a request to `http://localhost:8799/now/` will yield a response
+similar to the following one:
+
+
+```json
+{
+  "rfc3339": "2018-06-07T13:24:07+05:45",
+  "ansi_c": "Thu Jun  7 13:24:07 2018",
+  "unix_date": "Thu Jun  7 13:24:07 +0545 2018",
+  "unix_seconds": 1528357147,
+  "unix_nano_seconds": 1528357147091860422,
+  "ip": "[::1]"
+}
+// POST http://localhost:8799/now/
+// HTTP/1.1 200 OK
+// Content-Type: application/json
+```
+
+
+### Status code
 Mirror the status code requested through URL. Example:
 
 A request on `http://localhost:8799/status/400/` will return

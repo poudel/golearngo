@@ -73,19 +73,23 @@ func mirrorIp(w http.ResponseWriter, r *http.Request) {
 	w.Write(js)
 }
 
-type TimeResponse struct {
-	RFC3339 string `json:"rfc3339"`
-	ANSIC string `json:"ansic"`
-	UnixDate string `json:"unix_date"`
-	Ip string `json:"ip"`
+type NowResponse struct {
+	RFC3339         string `json:"rfc3339"`
+	ANSIC           string `json:"ansi_c"`
+	UnixDate        string `json:"unix_date"`
+	UnixSeconds     int64  `json:"unix_seconds"`
+	UnixNanoSeconds int64  `json:"unix_nano_seconds"`
+	Ip              string `json:"ip"`
 }
 
-func mirrorNow (w http.ResponseWriter, r *http.Request) {
+func mirrorNow(w http.ResponseWriter, r *http.Request) {
 	now := time.Now()
-	response := TimeResponse{
+	response := NowResponse{
 		now.Format(time.RFC3339),
 		now.Format(time.ANSIC),
 		now.Format(time.UnixDate),
+		now.Unix(),
+		now.UnixNano(),
 		cleanIp(r.RemoteAddr),
 	}
 
