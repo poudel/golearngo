@@ -12,7 +12,12 @@ import (
 type StatusResponse struct {
 	Message    string `json:"message"`
 	StatusCode int    `json:"status_code"`
-	Origin     string `json:"origin"`
+	Ip         string `json:"ip"`
+}
+
+func cleanIp(addr string) string {
+	occur := strings.LastIndex(addr, ":")
+	return addr[:occur]
 }
 
 func mirrorStatus(w http.ResponseWriter, r *http.Request) {
@@ -35,7 +40,7 @@ func mirrorStatus(w http.ResponseWriter, r *http.Request) {
 	response := StatusResponse{
 		message,
 		status_code,
-		r.RemoteAddr,
+		cleanIp(r.RemoteAddr),
 	}
 
 	js, err := json.Marshal(response)
@@ -51,11 +56,11 @@ func mirrorStatus(w http.ResponseWriter, r *http.Request) {
 }
 
 type IpResponse struct {
-	Origin string `json:"origin"`
+	Ip string `json:"ip"`
 }
 
 func mirrorIp(w http.ResponseWriter, r *http.Request) {
-	response := IpResponse{r.RemoteAddr}
+	response := IpResponse{cleanIp(r.RemoteAddr)}
 	js, err := json.Marshal(response)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
