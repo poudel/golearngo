@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type StatusResponse struct {
@@ -72,9 +73,35 @@ func mirrorIp(w http.ResponseWriter, r *http.Request) {
 	w.Write(js)
 }
 
+type TimeResponse struct {
+	RFC3339 string `json:"rfc3339"`
+	ANSIC string `json:"ansic"`
+	UnixDate string `json:"unix_date"`
+	Ip string `json:"ip"`
+}
+
+func mirrorNow (w http.ResponseWriter, r *http.Request) {
+	now := time.Now()
+	response := TimeResponse{
+		now.Format(time.RFC3339),
+		now.Format(time.ANSIC),
+		now.Format(time.UnixDate),
+		cleanIp(r.RemoteAddr),
+	}
+
+	js, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(js)
+}
+
 func main() {
 	http.HandleFunc("/status/", mirrorStatus)
 	http.HandleFunc("/ip/", mirrorIp)
+	http.HandleFunc("/now/", mirrorNow)
 
 	fmt.Println("Listening at 8799")
 	log.Fatal(http.ListenAndServe(":8799", nil))
